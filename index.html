@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Fridge Grand Prix</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Indie+Flower&family=Montserrat:ital,wght@0,100..900;1,100..900&family=PT+Sans:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+  <div class="scanlines" aria-hidden="true"></div>
+
+  <!-- headher -->
+  <header class="site-header">
+    <div class="header-left">
+      <div class="logo-lockup">
+        <span class="logo-ice">🧊</span>
+        <div class="logo-text">
+          <span class="logo-main">FRIDGE GRAND PRIX</span>
+          <span class="logo-sub">basically gambling</span>
+        </div>
+        <span class="logo-flag">🏁</span>
+      </div>
+    </div>
+    <div class="header-right">
+      <div class="stat-row">
+        <div class="stat-block">
+          <span class="stat-label">BALANCE</span>
+          <span class="stat-value gold" id="balance-display">$1,000</span>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat-block">
+          <span class="stat-label">NET P&L</span>
+          <span class="stat-value" id="pnl-display">$0</span>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat-block">
+          <span class="stat-label">RACES</span>
+          <span class="stat-value" id="races-display">0</span>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat-block">
+          <span class="stat-label">BEST WIN</span>
+          <span class="stat-value" id="best-display">$0</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="app-grid">
+
+    <section class="track-section">
+      <div class="track-frame">
+        <div class="track-header">
+          <span class="track-label">LIVE RACE FEED</span>
+          <span class="track-dot" id="live-dot"></span>
+        </div>
+        <div class="canvas-wrap" id="canvas-wrap">
+          <canvas id="gameCanvas" width="560" height="500"></canvas>
+
+          <!-- start -->
+          <div class="race-overlay" id="race-overlay">
+            <div class="overlay-content">
+              <p class="overlay-pre">WAITING FOR BETS</p>
+              <h2 class="overlay-title">PLACE YOUR BET<br/>TO START</h2>
+              <button class="btn btn-start" id="start-btn" disabled>SELECT A TEAM FIRST</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- live standings -->
+        <div class="standings-bar" id="standings-bar">
+          <span class="standings-label">POS</span>
+          <div class="standings-list" id="standings-list">
+            <span class="standings-placeholder">— awaiting race —</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <aside class="bet-panel">
+
+      <!-- team -->
+      <div class="panel-block">
+        <div class="panel-block-header">
+          <span class="panel-block-title">PICK YOUR RACER</span>
+          <span class="panel-block-note">TAP TO SELECT</span>
+        </div>
+        <div class="teams-grid" id="teams-list"></div>
+      </div>
+
+      <!-- amount -->
+      <div class="panel-block">
+        <div class="panel-block-header">
+          <span class="panel-block-title">YOUR WAGER</span>
+          <span class="bet-balance-note" id="bet-balance-note">of $1,000 available</span>
+        </div>
+
+        <div class="bet-amount-display">
+          <span class="bet-number" id="bet-display">100</span>
+        </div>
+
+        <div class="slider-wrap">
+          <input type="range" id="bet-slider" min="10" max="1000" step="10" value="100"/>
+          <div class="slider-track-fill" id="slider-fill"></div>
+        </div>
+
+        <div class="quick-bets">
+          <button class="btn btn-quick" data-pct="0.1">10%</button>
+          <button class="btn btn-quick" data-pct="0.25">25%</button>
+          <button class="btn btn-quick" data-pct="0.5">HALF</button>
+          <button class="btn btn-quick" data-pct="1">ALL IN</button>
+        </div>
+
+        <button class="btn btn-race" id="race-btn" disabled>
+          <span class="btn-race-icon">🏁</span>
+          <span class="btn-race-label">RACE!</span>
+        </button>
+
+        <div class="potential-return" id="potential-return">
+          Select a team to see potential payout
+        </div>
+      </div>
+
+      <!-- log -->
+      <div class="panel-block panel-block--log">
+        <div class="panel-block-header">
+          <span class="panel-block-title">RACE LOG</span>
+          <button class="btn-clear-log" id="clear-log-btn">CLEAR</button>
+        </div>
+        <ul class="log-list" id="log-list">
+          <li class="log-entry log-info">Welcome to the Fridge Grand Prix. Pick a racer and place your bet.</li>
+        </ul>
+      </div>
+
+    </aside>
+  </main>
+
+  <!-- result -->
+  <div class="modal-backdrop" id="result-backdrop">
+    <div class="modal result-modal" id="result-modal">
+      <div class="result-icon" id="result-icon">🏆</div>
+      <h2 class="result-title" id="result-title">YOU WON!</h2>
+      <div class="result-amount" id="result-amount">+$500</div>
+      <p class="result-desc" id="result-desc"></p>
+      <div class="result-meta" id="result-meta"></div>
+      <button class="btn btn-race" onclick="closeResult()" style="margin-top:8px;">NEXT RACE →</button>
+    </div>
+  </div>
+
+  <!-- bankrupt/millionare -->
+  <div class="special-screen" id="special-screen">
+    <div class="special-inner">
+      <div class="special-emoji" id="special-emoji">💀</div>
+      <h1 class="special-title" id="special-title">BANKRUPT!</h1>
+      <p class="special-desc" id="special-desc"></p>
+      <div class="special-stats" id="special-stats"></div>
+      <button class="btn btn-race" onclick="resetGame()">↺ START OVER WITH $1,000</button>
+    </div>
+  </div>
+
+  <!-- 
+    👀 hey, you're reading the source. curious, aren't you?
+    try typing  s-c-h-m-e-c-k-l-e-s  on your keyboard.
+    also... ↑ ↑ ↓ ↓ ← → ← → B A  (you know what to do)
+    and click the logo real fast.  like, five times.
+    — the fridge
+  -->
+  <script src="game.js"></script>
+</body>
+</html>
